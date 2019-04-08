@@ -29,9 +29,10 @@ class DB
 
   public function Execute($query)
   {
-    if($this->connection->query($query))
+    $result = $this->connection->query($query);
+    if($result)
     {
-      $this->last = $this->connection->query($query);
+      $this->last = $result;
       return TRUE;
     }
     return FALSE;
@@ -113,7 +114,7 @@ public function Insert($table,$data)
   //populate the last 2 variables
   foreach ($data as $key => $value) {
     $fields .= "`$key`,";
-    $values .= (is_numeric($value) && (intval($value) == $value) ) ? $value."," : "'$v',";
+    $values .= (is_numeric($value) && (intval($value) == $value) ) ? $value."," : "'$value',";
   }
   //remove the last "," in the end of variables
   $fields = substr($fields, 0,-1);
