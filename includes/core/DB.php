@@ -63,6 +63,19 @@ class DB
 
       return NULL;
   }
+  /**
+   *  Get all data from table
+   * @param string $table
+   * @param string $orderby
+   * @param int $limit
+   * @return array
+   */
+  public function GetAll($table)
+  {
+     $query = "SELECT * FROM $table";
+     if($this->Execute($query) && ($this->AffectedRows()>0))
+       return $this->GetRows();
+  }
 
   public function GetRow()
  {
