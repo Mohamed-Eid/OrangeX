@@ -4,6 +4,9 @@
  * Database commands
  * @author : Mohamed Eid
  */
+
+ // TODO: ADD basic functions of database like create table etc.
+
 class DB
 {
 
@@ -78,7 +81,8 @@ class DB
 
   public function AffectedRows()
   {
-    return $this->last->num_rows;
+    return mysqli_affected_rows($this->connection);
+    //return $this->last->num_rows;
   }
 
 
@@ -94,17 +98,94 @@ class DB
       return $count['COUNT(*)'];
   }
 
+/**
+ * Inserting record into database
+ * @param string $table
+ * @param array $data
+ * @return Boolean
+ */
+public function Insert($table,$data)
+{
+  // variables for fields and VALUES
+  $fields = '';
+  $values = '';
 
+  //populate the last 2 variables
+  foreach ($data as $key => $value) {
+    $fields .= "`$key`,";
+    $values .= (is_numeric($value) && (intval($value) == $value) ) ? $value."," : "'$v',";
+  }
+  //remove the last "," in the end of variables
+  $fields = substr($fields, 0,-1);
+  $values = substr($values, 0, -1);
 
+  $query = "INSERT INTO `{$table}` ({$fields}) VALUES({$values})";
 
+  //echo $query;
 
+  if($this->Execute($query))
+    return TRUE;
 
-
-
-
-
+  return FALSE;
 }
 
+/**
+ * @param string $from => table
+ * @param string $where => condition
+ * @return boolean
+ */
+public function Delete($from,$where)
+{
+  $query = sprintf('DELETE FROM `%s` %s',$from,$where);
+
+  if($this->Execute($query) && ($this->AffectedRows()>0))
+    return TRUE;
+
+  return FALSE;
+}
+
+
+/**
+ *
+ * @param string $table
+ * @param string $array
+ * @return Boolean
+ */
+public function Update($table,$data,$where='')
+{
+    //set $key = $value :)
+
+    $query  = '';
+    foreach ($data as $f => $v) {
+       (is_numeric($v) && intval($v) == $v || is_float($v))? $v."," : "'$v' ,";
+        $query  .= "`$f` = '{$v}' ,";
+    }
+
+    //Remove trailing ,
+    $query = substr($query, 0,-1);
+
+    $query = "UPDATE `{$table}` SET {$query} {$where}";
+    //echo $query;
+    if($this->Execute($query))
+        return TRUE;
+
+    return FALSE;
+}
+
+
+public function Last()
+{
+    return $this->connection->insert_id;
+}
+
+ /**
+ * Deconstructor :)
+ */
+public function __destruct() {
+    $this->connection->close();
+}
+
+}
 
 
 
